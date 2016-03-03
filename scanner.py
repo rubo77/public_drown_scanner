@@ -206,6 +206,9 @@ class Protocol(Enum):
     ESMTP      = 2
     IMAP       = 3
     POP3       = 4
+    PROXY      = 3128
+    XMPP       = 5222
+    FTP        = 21
 
 def sslv2_connect(ip, port, protocol, cipher_suite, result_additional_data):
     s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -233,7 +236,7 @@ def sslv2_connect(ip, port, protocol, cipher_suite, result_additional_data):
                 return NO_STARTTLS
             s.send("STARTTLS\r\n")
             starttls_response = s.recv(SOCKET_RECV_SIZE)
-        if protocol == Protocol.IMAP:
+        elif protocol == Protocol.IMAP:
             banner = s.recv(SOCKET_RECV_SIZE)
             s.send(". CAPABILITY\r\n")
             banner = s.recv(SOCKET_RECV_SIZE)
@@ -242,9 +245,31 @@ def sslv2_connect(ip, port, protocol, cipher_suite, result_additional_data):
                 return NO_STARTTLS
             s.send(". STARTTLS\r\n")
             starttls_response = s.recv(SOCKET_RECV_SIZE)
-        if protocol == Protocol.POP3:
+        elif protocol == Protocol.POP3:
             banner = s.recv(SOCKET_RECV_SIZE)
             s.send("STLS\r\n")
+            starttls_response = s.recv(SOCKET_RECV_SIZE)
+        elif protocol == Protocol.PROXY:
+            to = "github.com:443" if not ':' in sys.argv[-1] else sys.argv[-1]
+            print "%s: connecting to target %s" % (ip, to)
+            s.send("CONNECT %s HTTP/1.1\r\n\r\n" % to)
+            starttls_response = s.recv(SOCKET_RECV_SIZE)
+        elif protocol == Protocol.XMPP:
+            to = ip
+            s.send("<?xml version='1.0' ?><stream:stream to='%s' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' version='1.0'>"%to)
+            banner = ''
+            while not "</stream:features>" in banner: # get all the chunks
+                banner += s.recv(SOCKET_RECV_SIZE)
+                if not "<stream:" in banner:
+                   break 
+            if not '</starttls>' in banner:
+                print "%s: Case 2b; Server apparently doesn't support STARTTLS" % ip
+                return NO_STARTTLS
+            s.send("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>")
+            starttls_response = s.recv(SOCKET_RECV_SIZE)
+        elif protocol == Protocol.FTP:
+            banner = s.recv(SOCKET_RECV_SIZE)
+            s.send("AUTH TLS\r\n")
             starttls_response = s.recv(SOCKET_RECV_SIZE)
     except socket.error, e:
         print "Errorx: " + str(e) + " - starttls_response: '" + starttls_response + "'"
@@ -331,7 +356,7 @@ def sslv2_connect(ip, port, protocol, cipher_suite, result_additional_data):
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
-        sys.exit('Usage: %s <hostname> <port> [-esmtp|-imap|-pop3|-bare]' % sys.argv[0])
+        sys.exit('Usage: %s <hostname> <port> [-xmpp|-ftp|-proxy|-esmtp|-imap|-pop3|-bare]' % sys.argv[0])
 
     ip = sys.argv[1]
     port = int(sys.argv[2])
@@ -349,6 +374,12 @@ if __name__ == '__main__':
             protocol = Protocol.POP3
         elif sys.argv[3] == '-bare':
             protocol = Protocol.BARE_SSLv2
+        elif sys.argv[3] == '-proxy':
+            protocol = Protocol.PROXY
+        elif sys.argv[3] == '-ftp':
+            protocol = Protocol.FTP
+        elif sys.argv[3] == '-xmpp':
+            protocol = Protocol.XMPP
         else:
             print 'You gave 3 arguments, argument 3 is not a recognized protocol. Bailing out'
             sys.exit(1)
