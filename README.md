@@ -49,7 +49,7 @@ Pull requests clarifying the dependency list (and also general PRs) are welcome.
 
 ### On a Debian system:
 
-`sudo apt-get install tcpdump python-enum python-pyasn1 scapy python-crypto`
+`sudo apt-get install tcpdump python-enum python-pyasn1 scapy python-crypto python-pip`
 
 and also run
 
