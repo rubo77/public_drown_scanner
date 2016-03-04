@@ -15,15 +15,12 @@ import signal
 from binascii import hexlify
 import base64
 import os
-file_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(file_dir + "/scapy-ssl_tls/")
 
 import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 import scapy
 from scapy.all import *
-from ssl_tls import *
-import ssl_tls_crypto
+from scapy_ssl_tls.ssl_tls import *
 
 from pyx509.pkcs7.asn1_models.X509_certificate import Certificate
 from pyx509.pkcs7_models import X509Certificate, PublicKeyInfo, ExtendedKeyUsageExt

@@ -7,12 +7,6 @@ from scapy.fields import *
 from scapy.layers.inet import TCP, UDP
 import os, time
 
-try:
-    from scapy_ssl_tls import ssl_tls_crypto
-except ImportError, ie:
-    print "Import Error - most likely due to missing pycrypto libraries - disabling crypto functionality"
-    print repr(ie)
-
 class BLenField(LenField):
     def __init__(self, name, default, fmt="I", adjust_i2m=lambda pkt, x:x, numbytes=None, length_of=None, count_of=None, adjust_m2i=lambda pkt, x:x):
         self.name = name
