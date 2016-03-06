@@ -55,20 +55,23 @@ and also run
 
 `sudo pip install scapy-ssl_tls`
 
-### On a Fedora/RHEL/CentOS system:
+### On a Fedora/RHEL system:
 
 `sudo yum install python-enum scapy python-crypto tcpdump`
 
 and also run `sudo pip install scapy-ssl_tls`
 
-Some users have encountered problems on CentOS with the asn1 package (or in general),
-please see this issue for a suggested solution:
-
-https://github.com/nimia/public_drown_scanner/issues/30
-
 ### Or generally with pip:
 
 `sudo pip install enum pycrypto scapy pyasn1 scapy-ssl_tls`
+
+### CentOS:
+
+Some users have encountered problems on CentOS with the asn1 package (or in general).
+In addition to installing the above dependencies for Fedora/RHEL,
+please see this issue for a suggested solution:
+
+https://github.com/nimia/public_drown_scanner/issues/30
 
 ### Mac users
 
