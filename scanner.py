@@ -5,6 +5,7 @@ from enum import Enum
 import time
 import datetime
 import socket
+from termcolor import colored
 # In case your pip install pycrypto has placed the module in lowercase directories
 try:
     import Crypto.Cipher
@@ -400,6 +401,6 @@ if __name__ == '__main__':
                 else:
                     cve_string += " and CVE-2016-0703"
 
-            print '%s: Server is vulnerable%s, with cipher %s\n' % (ip, cve_string, string_description)
+            print '%s: Server is' % (ip), colored('vulnerable', 'red'), '%s, with cipher %s\n' % (cve_string, string_description)
         else:
-            print '%s: Server is NOT vulnerable with cipher %s, Message: %s\n' % (ip, string_description, ret)
+            print '%s: Server is' % (ip), colored('NOT vulnerable', 'green') , 'with cipher %s, Message: %s\n' % (string_description, ret)
